@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<robot name="jeep_gazebo" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find base_nav2_stack)/urdf/jeep.urdf.xacro"/>
+
+  <!-- Ackermann Steering + Drive -->
+  <gazebo>
+    <plugin filename="ignition-gazebo-ackermann-steering-system"
+            name="ignition::gazebo::systems::AckermannSteering">
+      <left_joint>front_left_wheel_joint</left_joint>
+      <right_joint>front_right_wheel_joint</right_joint>
+      <left_rear_joint>rear_left_wheel_joint</left_rear_joint>
+      <right_rear_joint>rear_right_wheel_joint</right_rear_joint>
+      <left_steering_joint>front_left_steer_joint</left_steering_joint>
+      <right_steering_joint>front_right_steer_joint</right_steering_joint>
+
+      <kingpin_width>1.86</kingpin_width>
+      <wheel_base>3.20</wheel_base>
+      <wheel_radius>0.386</wheel_radius>
+
+      <min_velocity>-4.0</min_velocity>
+      <max_velocity>8.0</max_velocity>
+      <min_acceleration>-1.5</min_acceleration>
+      <max_acceleration>1.5</max_acceleration>
+      <min_steering_angle>-0.611</min_steering_angle>
+      <max_steering_angle>0.611</max_steering_angle>
+      <min_steer_velocity>-0.5</min_steer_velocity>
+      <max_steer_velocity>0.5</max_steer_velocity>
+
+      <topic>/cmd_vel</topic>
+      <odom_topic>odom</odom_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_link</child_frame_id>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+  </gazebo>
+
+  <!-- Joint State Publisher -->
+  <gazebo>
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+            name="ignition::gazebo::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+      <joint_name>rear_left_wheel_joint</joint_name>
+      <joint_name>rear_right_wheel_joint</joint_name>
+      <joint_name>front_left_steer_joint</joint_name>
+      <joint_name>front_right_steer_joint</joint_name>
+      <joint_name>front_left_wheel_joint</joint_name>
+      <joint_name>front_right_wheel_joint</joint_name>
+    </plugin>
+  </gazebo>
+
+  <!-- Ouster LiDAR -->
+  <gazebo reference="os_sensor">
+    <material>Gazebo/Black</material>
+    <sensor name="ouster_lidar" type="gpu_lidar">
+      <pose>0 0 0 0 0 0</pose>
+      <topic>lidar</topic>
+      <update_rate>10</update_rate>
+      <gz_frame_id>os_lidar_link</gz_frame_id>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>1024</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.89</min_angle>
+            <max_angle>0.89</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>32</samples>
+            <resolution>1</resolution>
+            <min_angle>-0.2</min_angle>
+            <max_angle>0.174533</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.5</min>
+          <max>120.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+  <!-- IMU -->
+  <gazebo reference="imu_link">
+    <sensor name="vectornav_imu" type="imu">
+      <pose>0 0 0 0 0 0</pose>
+      <topic>imu</topic>
+      <update_rate>100</update_rate>
+      <gz_frame_id>imu_link</gz_frame_id>
+      <imu>
+        <angular_velocity>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.0014</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.0014</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.0014</stddev></noise></z>
+        </angular_velocity>
+        <linear_acceleration>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.017</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.017</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.017</stddev></noise></z>
+        </linear_acceleration>
+      </imu>
+    </sensor>
+  </gazebo>
+
+  <!-- GPS / NavSat -->
+  <gazebo reference="gps_link">
+    <sensor name="navsat" type="navsat">
+      <always_on>true</always_on>
+      <update_rate>10</update_rate>
+      <topic>/gps/fix</topic>
+      <gz_frame_id>gps_link</gz_frame_id>
+      <navsat>
+        <position_sensing>
+          <horizontal>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </horizontal>
+          <vertical>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.0</stddev>
+            </noise>
+          </vertical>
+        </position_sensing>
+      </navsat>
+    </sensor>
+  </gazebo>
+
+  <!-- Gazebo RGB-D Camera Sensor -->
+  <gazebo reference="camera_link">
+    <sensor name="front_rgbd_camera" type="rgbd_camera">
+      <always_on>true</always_on>
+      <update_rate>30</update_rate>
+      <topic>/jeep/camera</topic>
+      <visualize>true</visualize>
+      <gz_frame_id>camera_optical_link</gz_frame_id>
+      <pose>0 0 0 0 0 0</pose>
+      <camera>
+        <horizontal_fov>1.25</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.3</near>
+          <far>100.0</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- Wheel friction -->
+  <gazebo reference="front_left_wheel_link">
+    <mu1>0.5</mu1><mu2>0.5</mu2>
+    <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  <gazebo reference="front_right_wheel_link">
+    <mu1>0.5</mu1><mu2>0.5</mu2>
+    <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  <gazebo reference="rear_left_wheel_link">
+    <mu1>1.0</mu1><mu2>1.0</mu2>
+    <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  <gazebo reference="rear_right_wheel_link">
+    <mu1>1.0</mu1><mu2>1.0</mu2>
+    <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+
+</robot>

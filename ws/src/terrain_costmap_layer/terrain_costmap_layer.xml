@@ -1,0 +1,10 @@
+<library path="terrain_costmap_layer">
+  <class
+    name="terrain_costmap_layer::TerrainCostmapLayer"
+    type="terrain_costmap_layer::TerrainCostmapLayer"
+    base_class_type="nav2_costmap_2d::Layer">
+    <description>
+      Nav2 costmap layer that injects a terrain traversability OccupancyGrid into the local costmap.
+    </description>
+  </class>
+</library>

@@ -1,0 +1,39 @@
+vehicles:
+  ranger:
+    description: Polaris Ranger XP 1000 Crew (Ackermann)
+    urdf: urdf/ranger_gazebo.urdf.xacro
+    nav2_config: config/nav2/ranger.yaml
+    ekf_config: config/ekf/ranger_dual_ekf.yaml
+    rviz_config: rviz/ranger_nav2_custom.rviz
+    compatible_worlds: [CAST_new, baylands]
+    topics:
+      cmd_vel: /cmd_vel
+      odom: /odom
+      filtered_odom: /odometry/filtered
+      imu: /imu
+      gps: /gps/fix
+      scan: /lidar
+      points: /lidar/points
+      camera_image: /ranger/camera/image
+      camera_info: /ranger/camera/camera_info
+      camera_depth_image: /ranger/camera/depth_image
+      camera_points: /ranger/camera/points
+  jeep:
+    description: Jeep baseline simulation platform (Ackermann)
+    urdf: urdf/jeep_gazebo.urdf.xacro
+    nav2_config: config/nav2/jeep.yaml
+    ekf_config: config/ekf/jeep_dual_ekf.yaml
+    rviz_config: rviz/ranger_nav2_custom.rviz
+    compatible_worlds: [CAST_new, baylands]
+    topics:
+      cmd_vel: /cmd_vel
+      odom: /odom
+      filtered_odom: /odometry/filtered
+      imu: /imu
+      gps: /gps/fix
+      scan: /lidar
+      points: /lidar/points
+      camera_image: /jeep/camera/image
+      camera_info: /jeep/camera/camera_info
+      camera_depth_image: /jeep/camera/depth_image
+      camera_points: /jeep/camera/points

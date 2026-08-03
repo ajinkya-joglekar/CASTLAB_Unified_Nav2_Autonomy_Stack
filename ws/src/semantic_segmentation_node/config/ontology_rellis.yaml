@@ -1,0 +1,31 @@
+ontology:
+  classes:
+    - name: hard_traversable
+      prompt: dirt road, trail, asphalt, concrete
+      color: [160, 160, 160]
+
+    - name: grass
+      prompt: grass, field, lawn
+      color: [0, 200, 0]
+
+    - name: mud
+      prompt: mud, wet soil
+      color: [0, 255, 255]
+
+    - name: water
+      prompt: puddle, standing water, deep water
+      color: [255, 0, 0]
+
+    - name: vegetation
+      prompt: bush, tree, vegetation
+      color: [0, 90, 0]
+
+    - name: obstacle
+      prompt: vehicle, person, pole, fence, barrier, building, log, rubble, object
+      color: [0, 0, 255]
+
+model:
+  device: cuda
+  max_image_dim: 1024
+  mask_opacity: 0.15
+  border_width: 1

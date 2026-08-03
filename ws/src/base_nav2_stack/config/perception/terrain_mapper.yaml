@@ -1,0 +1,44 @@
+terrain_obstacle_grid_node:
+  ros__parameters:
+    points_topic: /camera/depth/points
+    mask_topic: /segmentation/mask
+    label_info_topic: /segmentation/label_info
+    grid_topic: /terrain/obstacle_grid
+    semantic_grid_topic: /terrain/semantic_grid
+    semantic_marker_topic: /terrain/semantic_grid_markers
+    cost_marker_topic: /terrain/obstacle_markers
+
+    grid_frame: base_link
+    resolution: 0.15
+    x_min: -5.0
+    x_max: 15.0
+    y_min: -10.0
+    y_max: 10.0
+
+    semantic_profile: auto
+
+    background_label: 0
+    sidewalk_label: 1
+    grass_label: 2
+
+    hard_traversable_cost: 20
+    grass_cost: 40
+    background_cost: 60
+    mud_cost: 75
+    water_cost: 95
+    vegetation_cost: 85
+    obstacle_cost: 100
+
+    default_observed_class: 0
+    default_observed_cost: 60
+
+    ground_z_min: -0.80
+    ground_z_max: 0.30
+    obstacle_z_threshold: 0.45
+    min_points_per_cell: 1
+    geometry_obstacle_override: true
+    max_mask_age_sec: 999999.0
+
+    debug_print_grid_stats: true
+    semantic_marker_alpha: 0.55
+    cost_marker_alpha: 0.50

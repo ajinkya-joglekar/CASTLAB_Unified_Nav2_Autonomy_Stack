@@ -1,0 +1,375 @@
+<?xml version="1.0"?>
+<robot name="jeep" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Starter simulation dimensions. Tune against hardware/CAD later. -->
+  <xacro:property name="wheelbase" value="3.1"/>
+  <xacro:property name="track_width_front" value="1.65"/>
+  <xacro:property name="track_width_rear" value="1.65"/>
+  <xacro:property name="wheel_radius" value="0.386"/>
+  <xacro:property name="wheel_width" value="0.30"/>
+  <xacro:property name="max_steering_angle" value="0.611"/>
+  <xacro:property name="vehicle_mass" value="820"/>
+  <xacro:property name="chassis_length" value="3.20"/>
+  <xacro:property name="chassis_width" value="1.60"/>
+  <xacro:property name="chassis_height" value="1.55"/>
+  <xacro:property name="chassis_z" value="0.95"/>
+  <xacro:property name="wheel_joint_z" value="${wheel_radius - chassis_z}"/>
+
+  <!-- base_link stays near the ground-projected vehicle center. -->
+  <link name="base_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="base_to_chassis_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="chassis_link"/>
+    <origin xyz="0 0 ${chassis_z}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="chassis_link">
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Chassis_Color.stl"/>
+      </geometry>
+      <material name="jeep_teal"><color rgba="0.2 0.6 0.5 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Chassis_Interior.stl"/>
+      </geometry>
+      <material name="jeep_interior_gray"><color rgba="0.15 0.15 0.15 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Windows.stl"/>
+      </geometry>
+      <material name="jeep_windows"><color rgba="0.8 0.8 0.8 0.6"/></material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Chassis_Black.stl"/>
+      </geometry>
+      <material name="jeep_black"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Chassis_White.stl"/>
+      </geometry>
+      <material name="jeep_white"><color rgba="1.0 1.0 1.0 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Chassis_Red.stl"/>
+      </geometry>
+      <material name="jeep_red"><color rgba="0.8 0.0 0.0 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Chassis_Orange.stl"/>
+      </geometry>
+      <material name="jeep_orange"><color rgba="1.0 0.6 0.05 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Body_Collision.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${vehicle_mass}"/>
+      <inertia ixx="312.49" ixy="0" ixz="0" iyy="776.89" iyz="0" izz="720.91"/>
+    </inertial>
+  </link>
+
+  <!-- Front Left Wheel + Knuckle -->
+  <link name="front_left_knuckle">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="front_left_steer_joint" type="revolute">
+    <parent link="chassis_link"/>
+    <child link="front_left_knuckle"/>
+    <origin xyz="${wheelbase/2} ${track_width_front/2} ${wheel_joint_z}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-max_steering_angle}" upper="${max_steering_angle}" effort="100" velocity="10"/>
+    <dynamics damping="5.0" friction="0.0"/>
+  </joint>
+
+  <link name="front_left_wheel_link">
+    <visual>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Black.stl"/></geometry>
+      <material name="wheel_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Gray.stl"/></geometry>
+      <material name="wheel_gray"><color rgba="0.8 0.8 0.8 0.6"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+  <joint name="front_left_wheel_joint" type="continuous">
+    <parent link="front_left_knuckle"/>
+    <child link="front_left_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- Front Right Wheel + Knuckle -->
+  <link name="front_right_knuckle">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="front_right_steer_joint" type="revolute">
+    <parent link="chassis_link"/>
+    <child link="front_right_knuckle"/>
+    <origin xyz="${wheelbase/2} ${-track_width_front/2} ${wheel_joint_z}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-max_steering_angle}" upper="${max_steering_angle}" effort="100" velocity="10"/>
+    <dynamics damping="5.0" friction="0.0"/>
+  </joint>
+
+  <link name="front_right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Black.stl"/></geometry>
+      <material name="fr_wheel_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Gray.stl"/></geometry>
+      <material name="fr_wheel_gray"><color rgba="0.8 0.8 0.8 0.6"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+  <joint name="front_right_wheel_joint" type="continuous">
+    <parent link="front_right_knuckle"/>
+    <child link="front_right_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- Rear wheels -->
+  <link name="rear_left_wheel_link">
+    <visual>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Black.stl"/></geometry>
+      <material name="rl_wheel_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <visual>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Gray.stl"/></geometry>
+      <material name="rl_wheel_gray"><color rgba="0.8 0.8 0.8 0.6"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <parent link="chassis_link"/>
+    <child link="rear_left_wheel_link"/>
+    <origin xyz="${-wheelbase/2.2} ${track_width_rear/2} ${wheel_joint_z}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <link name="rear_right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Black.stl"/></geometry>
+      <material name="rr_wheel_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry><mesh filename="$(find base_nav2_stack)/meshes/Jeep/Jeep_Wheel_Gray.stl"/></geometry>
+      <material name="rr_wheel_gray"><color rgba="0.8 0.8 0.8 0.6"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+  <joint name="rear_right_wheel_joint" type="continuous">
+    <parent link="chassis_link"/>
+    <child link="rear_right_wheel_link"/>
+    <origin xyz="${-wheelbase/2.2} ${-track_width_rear/2} ${wheel_joint_z}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- Dummy steering wheel joint retained for plugin compatibility symmetry. -->
+  <link name="steering_wheel_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="steering_wheel_joint" type="revolute">
+    <parent link="chassis_link"/>
+    <child link="steering_wheel_link"/>
+    <origin xyz="0.45 0.3 0.2" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-max_steering_angle}" upper="${max_steering_angle}" effort="10" velocity="10"/>
+    <dynamics damping="0.1" friction="0.0"/>
+  </joint>
+
+  <!-- Sensor mounting reference -->
+  <link name="top_base_link"/>
+  <joint name="top_link_joint" type="fixed">
+    <origin xyz="0 0 ${chassis_height/2}" rpy="0 0 0"/>
+    <parent link="chassis_link"/>
+    <child link="top_base_link"/>
+  </joint>
+
+  <!-- Front RGB-D Camera Mount -->
+  <xacro:property name="camera_x" value="2.43"/>
+  <xacro:property name="camera_y" value="0.0"/>
+  <xacro:property name="camera_z" value="-0.20"/>
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.06 0.12 0.04"/></geometry>
+      <material name="camera_black"><color rgba="0.01 0.01 0.01 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.06 0.12 0.04"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="camera_joint" type="fixed">
+    <parent link="chassis_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${camera_x} ${camera_y} ${camera_z}" rpy="0 0 0"/>
+  </joint>
+  <link name="camera_optical_link"/>
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_optical_link"/>
+    <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
+  </joint>
+
+  <!-- Ouster LiDAR -->
+  <link name="os_sensor">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0435" length="0.0735"/></geometry>
+      <material name="os1_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0435" length="0.0735"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.425"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="os_sensor_joint" type="fixed">
+    <parent link="top_base_link"/>
+    <child link="os_sensor"/>
+    <origin xyz="0.35 0 0.12" rpy="0 0.127409 0"/>
+  </joint>
+  <link name="os_lidar_link"/>
+  <joint name="os_lidar_joint" type="fixed">
+    <parent link="os_sensor"/>
+    <child link="os_lidar_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- VectorNav mount, IMU, and GPS -->
+  <link name="vectornav_mount_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.08 0.08 0.02"/></geometry>
+      <material name="vn_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+  <joint name="vectornav_mount_joint" type="fixed">
+    <parent link="chassis_link"/>
+    <child link="vectornav_mount_link"/>
+    <origin xyz="-0.8 0 0.05" rpy="0 0 0"/>
+  </joint>
+  <link name="imu_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.05 0.05 0.02"/></geometry>
+      <material name="imu_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <parent link="vectornav_mount_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  <link name="gps_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.06 0.06 0.01"/></geometry>
+      <material name="gps_darkgray"><color rgba="0.1 0.1 0.1 1.0"/></material>
+    </visual>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+  <joint name="gps_joint" type="fixed">
+    <parent link="chassis_link"/>
+    <child link="gps_link"/>
+    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+  </joint>
+
+</robot>

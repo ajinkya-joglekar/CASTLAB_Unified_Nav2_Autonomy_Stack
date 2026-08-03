@@ -1,0 +1,32 @@
+# ===== Nav2 GPS Docker aliases =====
+
+alias nav2_base_run='docker run -it \
+  --name nav2-base-dev \
+  --net=host \
+  --ipc=host \
+  --gpus all \
+  --user $(id -u):$(id -g) \
+  -e HOME=/ws/.home \
+  -e DISPLAY=$DISPLAY \
+  -e STADIA_API_KEY=$STADIA_API_KEY \
+  -e NVIDIA_VISIBLE_DEVICES=all \
+  -e NVIDIA_DRIVER_CAPABILITIES=all \
+  -v $(pwd)/.docker_identity/passwd:/etc/passwd:ro \
+  -v $(pwd)/.docker_identity/group:/etc/group:ro \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v $(pwd)/ws:/ws \
+  -w /ws \
+  nav2-base-jazzy \
+  --rcfile /ws/.bashrc_nav2'
+
+alias nav2_base_start='docker start -ai nav2-base-dev'
+
+alias nav2_base_exec='docker exec -it \
+  --user $(id -u):$(id -g) \
+  -w /ws \
+  nav2-base-dev \
+  bash --rcfile /ws/.bashrc_nav2'
+
+alias nav2_base_rm='docker rm nav2-base-dev'
+
+alias build_base='docker build --network=host --no-cache --pull -t nav2-base-jazzy .'

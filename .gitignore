@@ -1,0 +1,7 @@
+/ws/build/
+/ws/install/
+/ws/log/
+__pycache__/
+*.py[cod]
+ws/.home/
+.docker_identity/

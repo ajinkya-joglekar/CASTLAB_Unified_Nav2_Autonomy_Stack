@@ -1,0 +1,11 @@
+worlds:
+  CAST_new:
+    description: CAST Hangar, Texas A&M RELLIS campus
+    sdf: worlds/CAST_new/CAST_new.sdf
+    gazebo_name: CAST_new
+    spawn: {x: 16.0, y: -16.5, z: 1.6, yaw: 0.0}
+  baylands:
+    description: Baylands outdoor environment
+    sdf: worlds/baylands_world/baylands.sdf
+    gazebo_name: baylands
+    spawn: {x: 0.0, y: 0.0, z: 0.3, yaw: 0.0}

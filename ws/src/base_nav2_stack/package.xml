@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>base_nav2_stack</name>
+  <version>0.1.0</version>
+  <description>Profile-driven Nav2 GPS baseline for simulation and hardware.</description>
+  <maintainer email="ajoglek@tamu.edu">Ajinkya Joglekar</maintainer>
+  <license>Apache-2.0</license>
+
+  <depend>ament_index_python</depend>
+  <depend>geographic_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>depth_image_proc</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>mapviz</depend>
+  <depend>mapviz_plugins</depend>
+  <depend>nav2_bringup</depend>
+  <depend>nav2_common</depend>
+  <depend>nav2_simple_commander</depend>
+  <depend>navigation2</depend>
+  <depend>rclpy</depend>
+  <depend>robot_localization</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>ros_gz_bridge</depend>
+  <depend>ros_gz_sim</depend>
+  <depend>rosidl_runtime_py</depend>
+  <depend>sensor_msgs</depend>
+  <depend>semantic_segmentation_node</depend>
+  <depend>tile_map</depend>
+  <depend>terrain_costmap_layer</depend>
+  <depend>terrain_obstacle_mapper</depend>
+  <depend>xacro</depend>
+  <exec_depend>python3-yaml</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

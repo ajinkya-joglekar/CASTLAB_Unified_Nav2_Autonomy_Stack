@@ -1,0 +1,28 @@
+models:
+  rellis_7_class:
+    description: RELLIS-style 7-class traversability model using canonical terrain labels.
+    model_path: package://semantic_segmentation_node/models/rellis_pp_lite_b_seg_v2.onnx
+    config_path: package://semantic_segmentation_node/config/ontology_rellis.yaml
+    semantic_profile: rellis7
+    input_width: 512
+    input_height: 512
+    resize_input: true
+    normalize: true
+    device: auto
+    publish_overlay: true
+    debug_histogram: true
+    debug_every_n_frames: 30
+
+  nav2_demo_3_class:
+    description: 3-class demo model mapped into the canonical terrain ontology.
+    model_path: package://semantic_segmentation_node/models/model_3_class.onnx
+    config_path: package://semantic_segmentation_node/config/ontology_3_class.yaml
+    semantic_profile: nav2_demo3
+    input_width: 512
+    input_height: 512
+    resize_input: true
+    normalize: true
+    device: auto
+    publish_overlay: true
+    debug_histogram: true
+    debug_every_n_frames: 30

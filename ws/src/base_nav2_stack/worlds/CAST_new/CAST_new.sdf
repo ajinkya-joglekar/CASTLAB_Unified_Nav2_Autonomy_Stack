@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="CAST_new">
+	<!-- Added these custom plugins from the old xacro file -->
+	<plugin filename="gz-sim-physics-system"
+		name="gz::sim::systems::Physics"/>
+
+	<plugin filename="gz-sim-user-commands-system"
+		name="gz::sim::systems::UserCommands"/>
+
+	<plugin filename="gz-sim-scene-broadcaster-system"
+		name="gz::sim::systems::SceneBroadcaster"/>
+
+	<plugin filename="gz-sim-navsat-system"
+		name="gz::sim::systems::NavSat"/>
+
+	<plugin filename="gz-sim-sensors-system"
+		name="gz::sim::systems::Sensors">
+	  <render_engine>ogre2</render_engine>
+	</plugin>
+
+	<plugin filename="gz-sim-imu-system"
+		name="gz::sim::systems::Imu"/>
+		
+    <gravity>0 0 -9.8066</gravity>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>30.632594697996822</latitude_deg>
+      <longitude_deg>-96.47575378417969</longitude_deg>
+      <elevation>76.60000000000036</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+
+        
+    <physics name="1ms" type="ignored">
+      <dart>
+        <!-- Heightmaps behave better with the bullet collision detector -->
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics>
+
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+
+    <!-- Environment model -->
+    <include>
+      <uri>model://CAST_new</uri>
+    </include>
+<!-- 
+    <include>
+      <uri>https://fuel.gazebosim.org/1.0/saiaravind19/models/helipad</uri>
+    </include> -->
+
+
+  </world>
+</sdf>

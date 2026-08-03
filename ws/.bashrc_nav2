@@ -1,0 +1,91 @@
+source /opt/ros/jazzy/setup.bash
+
+if [ -f /ws/install/setup.bash ]; then
+  source /ws/install/setup.bash
+fi
+
+alias ws='cd /ws'
+alias src='cd /ws/src'
+alias base='cd /ws/src/base_nav2_stack'
+alias ss='cd /ws/src/semantic_segmentation_node'
+alias tm='cd /ws/src/terrain_obstacle_mapper'
+alias tcost='cd /ws/src/terrain_costmap_layer'
+
+alias setup='source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash'
+
+alias build='cd /ws && colcon build --symlink-install && source /ws/install/setup.bash'
+
+alias buildbase='cd /ws && colcon build --symlink-install --packages-select base_nav2_stack && source /ws/install/setup.bash'
+alias buildss='cd /ws && colcon build --symlink-install --packages-select semantic_segmentation_node && source /ws/install/setup.bash'
+alias buildtm='cd /ws && colcon build --symlink-install --packages-select terrain_obstacle_mapper && source /ws/install/setup.bash'
+alias buildtcost='cd /ws && colcon build --symlink-install --packages-select terrain_costmap_layer && source /ws/install/setup.bash'
+
+rebuildpkg() {
+    if [ -z "$1" ]; then
+        echo "Usage: rebuildpkg <package_name>"
+        return 1
+    fi
+
+    cd /ws || return 1
+    echo "Removing build/$1 install/$1..."
+    rm -rf "build/$1" "install/$1"
+    echo "Rebuilding $1..."
+    colcon build --symlink-install --packages-select "$1"
+    source /ws/install/setup.bash
+}
+
+alias rebuildbase='rebuildpkg base_nav2_stack'
+alias rebuildss='rebuildpkg semantic_segmentation_node'
+alias rebuildtm='rebuildpkg terrain_obstacle_mapper'
+alias rebuildtcost='rebuildpkg terrain_costmap_layer'
+
+alias rebuildterrain='cd /ws && \
+    rm -rf build/semantic_segmentation_node install/semantic_segmentation_node && \
+    rm -rf build/terrain_obstacle_mapper install/terrain_obstacle_mapper && \
+    rm -rf build/terrain_costmap_layer install/terrain_costmap_layer && \
+    colcon build --symlink-install --packages-select \
+      semantic_segmentation_node \
+      terrain_obstacle_mapper \
+      terrain_costmap_layer && \
+    source /ws/install/setup.bash'
+
+alias rebuildcustom='cd /ws && \
+    rm -rf build/base_nav2_stack install/base_nav2_stack && \
+    rm -rf build/semantic_segmentation_node install/semantic_segmentation_node && \
+    rm -rf build/terrain_obstacle_mapper install/terrain_obstacle_mapper && \
+    rm -rf build/terrain_costmap_layer install/terrain_costmap_layer && \
+    colcon build --symlink-install --packages-select \
+      base_nav2_stack \
+      semantic_segmentation_node \
+      terrain_obstacle_mapper \
+      terrain_costmap_layer && \
+    source /ws/install/setup.bash'
+
+alias basenav='ros2 launch base_nav2_stack base_stack.launch.py mode:=sim vehicle:=ranger world:=CAST_new use_rviz:=True'
+alias navgui='ros2 run base_nav2_stack launch_gui'
+
+alias nav2_clean='\
+pkill -f rviz2 || true; \
+pkill -f segmentation_node || true; \
+pkill -f terrain_obstacle_grid_node || true; \
+pkill -f controller_server || true; \
+pkill -f planner_server || true; \
+pkill -f smoother_server || true; \
+pkill -f bt_navigator || true; \
+pkill -f waypoint_follower || true; \
+pkill -f velocity_smoother || true; \
+pkill -f lifecycle_manager || true; \
+pkill -f behavior_server || true; \
+pkill -f collision_monitor || true; \
+pkill -f ekf_node || true; \
+pkill -f navsat_transform || true; \
+pkill -f robot_state_publisher || true; \
+pkill -f parameter_bridge || true; \
+pkill -f ros_gz_bridge || true; \
+pkill -f gz || true; \
+ros2 daemon stop || true; \
+ros2 daemon start || true'
+
+alias nodes='ros2 node list'
+alias topics='ros2 topic list'
+alias ll='ls -lah'

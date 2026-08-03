@@ -1,0 +1,462 @@
+<?xml version="1.0"?>
+<robot name="ranger" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Vehicle parameters (2019 Polaris Ranger XP 1000 Crew) -->
+  <xacro:property name="wheelbase" value="2.91"/>
+  <xacro:property name="track_width_front" value="1.3514"/>
+  <xacro:property name="track_width_rear" value="1.3006"/>
+  <xacro:property name="wheel_radius" value="0.35"/>
+  <xacro:property name="front_wheel_width" value="0.2286"/>
+  <xacro:property name="rear_wheel_width" value="0.2794"/>
+  <xacro:property name="max_steering_angle" value="0.611"/>
+  <xacro:property name="vehicle_mass" value="1000"/>
+  <xacro:property name="chassis_length" value="3.86"/>
+  <xacro:property name="chassis_width" value="1.58"/>
+  <xacro:property name="chassis_height" value="1.96"/>
+
+  <!-- ============================== -->
+  <!-- base_link (ground level)       -->
+  <!-- ============================== -->
+  <!-- <link name="base_link"></link>
+
+  <joint name="base_link_joint" type="fixed">
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="chassis_link"/>
+  </joint> -->
+
+  <!-- ============================== -->
+  <!-- Chassis (physical body)        -->
+  <!-- ============================== -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="${-wheelbase/2} 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Polaris/Ranger.stl"/>
+      </geometry>
+      <material name="ranger_red">
+        <color rgba="0.7 0.05 0.05 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 ${chassis_height/2 + 0.05}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${vehicle_mass}"/>
+      <inertia ixx="312.49" ixy="0" ixz="0" iyy="776.89" iyz="0" izz="720.91"/>
+    </inertial>
+  </link>
+
+  <!-- ============================== -->
+  <!-- Front Left Wheel + Knuckle     -->
+  <!-- ============================== -->
+  <link name="front_left_knuckle">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="front_left_steer_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="front_left_knuckle"/>
+    <origin xyz="${wheelbase/2} ${track_width_front/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-max_steering_angle}" upper="${max_steering_angle}" effort="100" velocity="10"/>
+    <dynamics damping="5.0" friction="0.0"/>
+  </joint>
+
+  <link name="front_left_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Polaris/wheel.stl"/>
+      </geometry>
+      <material name="wheel_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${front_wheel_width}" radius="${wheel_radius}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+
+  <joint name="front_left_wheel_joint" type="continuous">
+    <parent link="front_left_knuckle"/>
+    <child link="front_left_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Front Right Wheel + Knuckle    -->
+  <!-- ============================== -->
+  <link name="front_right_knuckle">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="front_right_steer_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="front_right_knuckle"/>
+    <origin xyz="${wheelbase/2} ${-track_width_front/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-max_steering_angle}" upper="${max_steering_angle}" effort="100" velocity="10"/>
+    <dynamics damping="5.0" friction="0.0"/>
+  </joint>
+
+  <link name="front_right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Polaris/wheel.stl"/>
+      </geometry>
+      <material name="fr_wheel_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${front_wheel_width}" radius="${wheel_radius}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+
+  <joint name="front_right_wheel_joint" type="continuous">
+    <parent link="front_right_knuckle"/>
+    <child link="front_right_wheel_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Rear Left Wheel                -->
+  <!-- ============================== -->
+  <link name="rear_left_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Polaris/wheel.stl"/>
+      </geometry>
+      <material name="rl_wheel_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${rear_wheel_width}" radius="${wheel_radius}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="rear_left_wheel_link"/>
+    <origin xyz="${-wheelbase/2} ${track_width_rear/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Rear Right Wheel               -->
+  <!-- ============================== -->
+  <link name="rear_right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+      <geometry>
+        <mesh filename="$(find base_nav2_stack)/meshes/Polaris/wheel.stl"/>
+      </geometry>
+      <material name="rr_wheel_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder length="${rear_wheel_width}" radius="${wheel_radius}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="20"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1.80" ixy="0" ixz="0" iyy="3.06" iyz="0" izz="1.80"/>
+    </inertial>
+  </link>
+
+  <joint name="rear_right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="rear_right_wheel_link"/>
+    <origin xyz="${-wheelbase/2} ${-track_width_rear/2} 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400" velocity="50"/>
+    <dynamics damping="1.0" friction="0.0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Steering Wheel (dummy joint)   -->
+  <!-- Required by libgazebo_ros_ackermann_drive — plugin v3.9 will not register
+       its world-update callback if this joint is missing, causing no motion.    -->
+  <!-- ============================== -->
+  <link name="steering_wheel_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="steering_wheel_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="steering_wheel_link"/>
+    <origin xyz="0.5 0.3 1.0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-max_steering_angle}" upper="${max_steering_angle}" effort="10" velocity="10"/>
+    <dynamics damping="0.1" friction="0.0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!--     Top Chassis Link (roof)    -->
+  <!-- ============================== -->
+  <link name="top_base_link" />
+  <joint name="top_link_joint" type="fixed">
+    <origin xyz="0 0 ${chassis_height - wheel_radius}" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="top_base_link" />
+  </joint>
+
+  <!-- ============================== -->
+  <!--       Rear Chassis Link        -->
+  <!-- ============================== -->
+  <!-- <link name="rear_base_link" />
+  <joint name="rear_link_joint" type="fixed">
+    <origin xyz="${-chassis_length/2} 0 ${chassis_height/2 - wheel_radius}" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="rear_base_link" />
+  </joint> -->
+
+  <!-- ============================== -->
+  <!--       Front Chassis Link       -->
+  <!-- ============================== -->
+  <!-- <link name="front_base_link" />
+  <joint name="front_link_joint" type="fixed">
+    <origin xyz="${chassis_length/2} 0 ${chassis_height/2 - wheel_radius}" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="front_base_link" />
+  </joint> -->
+  
+	<!-- ========================= -->
+	<!-- Front RGB-D Camera Mount  -->
+	<!-- ========================= -->
+
+	<xacro:property name="camera_x" value="1.95"/>
+	<xacro:property name="camera_y" value="0.0"/>
+	<xacro:property name="camera_z" value="0.35"/>
+
+	<link name="camera_link">
+	  <visual>
+	    <origin xyz="0 0 0" rpy="0 0 0"/>
+	    <geometry>
+	      <box size="0.06 0.12 0.04"/>
+	    </geometry>
+	    <material name="black">
+	      <color rgba="0.01 0.01 0.01 1.0"/>
+	    </material>
+	  </visual>
+
+	  <collision>
+	    <origin xyz="0 0 0" rpy="0 0 0"/>
+	    <geometry>
+	      <box size="0.06 0.12 0.04"/>
+	    </geometry>
+	  </collision>
+
+	  <inertial>
+	    <origin xyz="0 0 0" rpy="0 0 0"/>
+	    <mass value="0.10"/>
+	    <inertia
+	      ixx="0.0001" ixy="0.0" ixz="0.0"
+	      iyy="0.0001" iyz="0.0"
+	      izz="0.0001"/>
+	  </inertial>
+	</link>
+
+	<joint name="camera_joint" type="fixed">
+	  <parent link="base_link"/>
+	  <child link="camera_link"/>
+
+	  <!-- 
+	    x forward, y left, z up in ROS base_link convention.
+	    This places camera in front/top of Ranger.
+	  -->
+	  <origin xyz="${camera_x} ${camera_y} ${camera_z}" rpy="0 0 0"/>
+	</joint>
+
+	<!-- Optical frame for ROS camera convention:
+	     z forward, x right, y down.
+	-->
+	<link name="camera_optical_link"/>
+
+	<joint name="camera_optical_joint" type="fixed">
+	  <parent link="camera_link"/>
+	  <child link="camera_optical_link"/>
+
+	  <!-- ROS optical frame rotation -->
+	  <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
+	</joint>  
+
+  <!-- ============================== -->
+  <!-- Ouster LiDAR (front of roof)   -->
+  <!-- ============================== -->
+  <link name="os_sensor">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.0435" length="0.0735"/>
+      </geometry>
+      <material name="os1_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.0435" length="0.0735"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.425"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="os_sensor_joint" type="fixed">
+    <parent link="top_base_link"/>
+    <child link="os_sensor"/>
+    <origin xyz="0.61 0 0.15" rpy="0 0.127409 0"/>
+  </joint>
+
+  <!-- os_lidar_link: Virtual frame for pointcloud data -->
+  <link name="os_lidar_link"/>
+  <joint name="os_lidar_joint" type="fixed">
+    <parent link="os_sensor"/>
+    <child link="os_lidar_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- VectorNav mount (rear axle)    -->
+  <!-- ============================== -->
+  <link name="vectornav_mount_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.08 0.08 0.02"/>
+      </geometry>
+      <material name="vn_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="vectornav_mount_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="vectornav_mount_link"/>
+    <origin xyz="-1.6764 0 0.8255" rpy="0 0 0"/>
+  </joint>
+
+  <!-- IMU (child of vectornav mount) -->
+  <link name="imu_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.05 0.05 0.02"/>
+      </geometry>
+      <material name="imu_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="vectornav_mount_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- GPS (child of vectornav mount) -->
+  <!-- Modifications to the GPS link for gazebo position spoofing -->
+  <link name="gps_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.06 0.06 0.01"/>
+      </geometry>
+      <material name="gps_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="gps_joint" type="fixed">
+  <parent link ="base_link"/>
+ <!-- <parent link="vectornav_mount_link"/> -->
+    <child link="gps_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+</robot>

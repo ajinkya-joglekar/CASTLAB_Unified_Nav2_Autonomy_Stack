@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>terrain_costmap_layer</name>
+  <version>0.0.1</version>
+  <description>Nav2 costmap layer for terrain traversability occupancy grids.</description>
+
+  <maintainer email="ajoglek@tamu.edu">Ajinkya Joglekar</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>nav2_costmap_2d</depend>
+  <depend>pluginlib</depend>
+  <depend>nav_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+    <nav2_costmap_2d plugin="${prefix}/terrain_costmap_layer.xml"/>
+  </export>
+</package>
