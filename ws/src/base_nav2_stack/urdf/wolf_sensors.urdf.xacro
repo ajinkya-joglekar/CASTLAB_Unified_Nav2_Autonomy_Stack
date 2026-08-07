@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<robot name="wolf_sensors" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Wolf skid steer + LiDAR + RGB-D camera sensor mounts.
+       Includes the base wolf model (wheels, chassis, IMU, GPS) and adds the
+       same sensor link/joint structure used by the ranger and jeep. -->
+
+  <xacro:include filename="$(find base_nav2_stack)/urdf/wolf.urdf.xacro"/>
+
+  <!-- ============================== -->
+  <!--       Top Sensor Mount         -->
+  <!-- ============================== -->
+  <link name="top_base_link"/>
+  <joint name="top_link_joint" type="fixed">
+    <origin xyz="0 0 0.905" rpy="0 0 0"/>
+    <parent link="wolf_chassis_link"/>
+    <child link="top_base_link"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Lidar mast (visual support)    -->
+  <!-- ============================== -->
+  <link name="sensor_mast">
+    <visual>
+      <origin xyz="0 0 0.24" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.02" length="0.48"/>
+      </geometry>
+      <material name="mast_darkgray">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+  </link>
+  <joint name="sensor_mast_joint" type="fixed">
+    <parent link="top_base_link"/>
+    <child link="sensor_mast"/>
+    <origin xyz="0.3 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Ouster LiDAR (front of roof)   -->
+  <!-- ============================== -->
+  <link name="os_sensor">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.0435" length="0.0735"/>
+      </geometry>
+      <material name="os1_darkgray">
+        <color rgba="0.1 0.1 0.1 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.0435" length="0.0735"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.425"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="os_sensor_joint" type="fixed">
+    <parent link="top_base_link"/>
+    <child link="os_sensor"/>
+    <origin xyz="0.3 0 0.48" rpy="0 0.127409 0"/>
+  </joint>
+
+  <!-- os_lidar_link: Virtual frame for pointcloud data -->
+  <link name="os_lidar_link"/>
+  <joint name="os_lidar_joint" type="fixed">
+    <parent link="os_sensor"/>
+    <child link="os_lidar_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ============================== -->
+  <!-- Front RGB-D Camera Mount       -->
+  <!-- ============================== -->
+  <xacro:property name="camera_x" value="1.1"/>
+  <xacro:property name="camera_y" value="0.0"/>
+  <xacro:property name="camera_z" value="1.0"/>
+  <xacro:property name="camera_pitch" value="0.1745"/>
+
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.06 0.12 0.04"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0.01 0.01 0.01 1.0"/>
+      </material>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.06 0.12 0.04"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.10"/>
+      <inertia
+        ixx="0.0001" ixy="0.0" ixz="0.0"
+        iyy="0.0001" iyz="0.0"
+        izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="wolf_chassis_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${camera_x} ${camera_y} ${camera_z}" rpy="0 ${camera_pitch} 0"/>
+  </joint>
+
+  <!-- Optical frame for ROS camera convention:
+       z forward, x right, y down. -->
+  <link name="camera_optical_link"/>
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_optical_link"/>
+    <origin xyz="0 0 0" rpy="-1.57079632679 0 -1.57079632679"/>
+  </joint>
+
+</robot>

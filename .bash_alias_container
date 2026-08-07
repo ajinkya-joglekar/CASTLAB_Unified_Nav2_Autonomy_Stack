@@ -2,7 +2,6 @@
 
 alias nav2_base_run='docker run -it \
   --name nav2-base-dev \
-  --net=host \
   --ipc=host \
   --gpus all \
   --user $(id -u):$(id -g) \
@@ -14,6 +13,7 @@ alias nav2_base_run='docker run -it \
   -v $(pwd)/.docker_identity/passwd:/etc/passwd:ro \
   -v $(pwd)/.docker_identity/group:/etc/group:ro \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v /dev/dri:/dev/dri \
   -v $(pwd)/ws:/ws \
   -w /ws \
   nav2-base-jazzy \
