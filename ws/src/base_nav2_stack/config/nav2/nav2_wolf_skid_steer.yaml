@@ -64,13 +64,13 @@ controller_server:
       plugin: "nav2_controller::SimpleGoalChecker"
       stateful: true
       # Kept from the GPS/off-road Ackermann configuration.
-      xy_goal_tolerance: 1.5
-      yaw_goal_tolerance: 1.00
+      xy_goal_tolerance: 0.15
+      yaw_goal_tolerance: 0.20
 
     FollowPath:
       plugin: "nav2_mppi_controller::MPPIController"
 
-      time_steps: 72
+      time_steps: 75
       model_dt: 0.05
       batch_size: 2000
       iteration_count: 1
@@ -83,29 +83,30 @@ controller_server:
       # Ackermann minimum-turning-radius constraint.
       motion_model: "DiffDrive"
 
-      vx_std: 0.4
+      vx_std: 0.2
       vy_std: 0.0
-      wz_std: 0.50
+      wz_std: 1.5
 
       # Start conservatively and tune to the Wolf's actual actuator limits.
       # Keep vy = 0 for a skid-steer base.
-      vx_max: 2.0
-      vx_min: -0.5
+      vx_max: 1.2
+      vx_min: -1.2
       vy_max: 0.0
-      wz_max: 1.2
+      wz_max: 2.0
 
       ax_max: 1.5
-      ax_min: -1.5
+      ax_min: -3.5
       ay_max: 0.0
       ay_min: 0.0
-      az_max: 1.5
+      az_max: 4.0
 
-      prune_distance: 3.0
+      prune_distance: 1.5
       transform_tolerance: 0.3
-      temperature: 0.3
+      temperature: 0.5
       gamma: 0.015
       visualize: true
       regenerate_noises: true
+      noise_decay_ratio: 0.95
 
       TrajectoryVisualizer:
         trajectory_step: 5
@@ -120,73 +121,63 @@ controller_server:
           "PathAlignCritic",
           "PathFollowCritic",
           "PathAngleCritic",
-          "PreferForwardCritic"
         ]
 
       ConstraintCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 6.0
+        cost_weight: 4.0
 
       GoalCritic:
         enabled: true
         cost_power: 1
         cost_weight: 5.0
-        threshold_to_consider: 2.0
+        threshold_to_consider: 0.75
 
       GoalAngleCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 1.0
-        threshold_to_consider: 0.5
-
-      # Skid steer can reverse and pivot, so do not use the very strong
-      # Ackermann forward-only bias from the old configuration.
-      PreferForwardCritic:
-        enabled: true
-        cost_power: 1
-        cost_weight: 5.0
+        cost_weight: 3.0
         threshold_to_consider: 0.5
 
       CostCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 20.0
-        near_collision_cost: 200
-        critical_cost: 300.0
+        cost_weight: 1.0
+        near_collision_cost: 80
+        critical_cost: 250.0
         consider_footprint: true
         collision_cost: 1000000.0
         near_goal_distance: 2.0
-        trajectory_point_step: 1
+        trajectory_point_step: 2
 
       PathAlignCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 3.0
-        max_path_occupancy_ratio: 0.2
-        trajectory_point_step: 4
-        threshold_to_consider: 1.5
+        cost_weight: 3.0          # Up from 8.0: Heavily penalizes trajectories drifting away from path heading
+        max_path_occupancy_ratio: 0.05
+        trajectory_point_step: 2
+        threshold_to_consider: 0.5
         offset_from_furthest: 20
-        # SmacPlanner2D does not provide a kinematically directional path
-        # like Hybrid-A*, so do not force the controller to obey path yaw.
         use_path_orientations: false
 
+      # 2. Boost PathFollowCritic to penalize physical distance from the line
       PathFollowCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 6.0
-        offset_from_furthest: 6
-        threshold_to_consider: 2.0
+        cost_weight: 30.0          # Up from 15.0: Forces the robot to physically hug the path
+        offset_from_furthest: 5
+        threshold_to_consider: 0.5
 
       PathAngleCritic:
         enabled: true
         cost_power: 1
-        cost_weight: 1.0
-        offset_from_furthest: 6
-        threshold_to_consider: 1.0
+        cost_weight: 10.0
+        offset_from_furthest: 4
+        threshold_to_consider: 0.5
         max_angle_to_furthest: 1.57
-        # Mode 0 encourages the diff-drive robot to rotate toward the path.
-        mode: 0
+        mode: 1
+
 
 
 local_costmap:
@@ -196,45 +187,25 @@ local_costmap:
       global_frame: odom
       robot_base_frame: base_link
 
-      update_frequency: 3.0
+      update_frequency: 5.0
       publish_frequency: 2.0
 
       rolling_window: true
-      width: 12
-      height: 12
-      resolution: 0.1
+      width: 10
+      height: 10
+      resolution: 0.05
 
       # Physical 2D envelope from the Wolf URDF. Front x includes the
       # RGB-D camera overhang; wheels determine the maximum lateral extent.
       footprint: "[[1.13, 0.746], [1.13, -0.746], [-1.019, -0.746], [-1.019, 0.746]]"
-      footprint_padding: 0.05
+      footprint_padding: 0.02
 
-      plugins: ["obstacle_layer", "inflation_layer"]
+      plugins: ["inflation_layer"]
       
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: true
-        observation_sources: points
-
-        points:
-          topic: /points
-          data_type: "PointCloud2"
-          clearing: true
-          marking: true
-          min_obstacle_height: 0.05
-          max_obstacle_height: 3.5
-          raytrace_max_range: 20.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 10.0
-          obstacle_min_range: 0.0
-          observation_persistence: 0.5
-          expected_update_rate: 0.0
-          inf_is_valid: true
-
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 1.6
-        cost_scaling_factor: 1.5
+        inflation_radius: 1.8 
+        cost_scaling_factor: 5.0 
 
       always_send_full_costmap: true
 
@@ -260,39 +231,18 @@ global_costmap:
       footprint: "[[1.13, 0.746], [1.13, -0.746], [-1.019, -0.746], [-1.019, 0.746]]"
       footprint_padding: 0.05
 
-      plugins: ["obstacle_layer", "inflation_layer"]
-
-      obstacle_layer:
-        plugin: "nav2_costmap_2d::ObstacleLayer"
-        enabled: true
-        observation_sources: points
-        combination_method: 1
-
-        points:
-          topic: /points
-          data_type: "PointCloud2"
-          clearing: true
-          marking: true
-          min_obstacle_height: 0.05
-          max_obstacle_height: 3.5
-          raytrace_max_range: 15.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 15.0
-          obstacle_min_range: 0.0
-          inf_is_valid: true
-          observation_persistence: 0.3
-          expected_update_rate: 0.15
+      plugins: ["inflation_layer"]
 
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        inflation_radius: 1.6
+        inflation_radius: 1.8
         cost_scaling_factor: 1.5
       always_send_full_costmap: true
 
 planner_server:
   ros__parameters:
     use_sim_time: true
-    expected_planner_frequency: 5.0
+    expected_planner_frequency: 20.0
     planner_plugins: ["GridBased"]
     costmap_update_timeout: 2.0
 
@@ -305,7 +255,7 @@ planner_server:
       # differential/skid-steer base that can rotate in place.
       plugin: "nav2_smac_planner::SmacPlanner2D"
 
-      tolerance: 2.0
+      tolerance: 0.5
       downsample_costmap: false
       downsampling_factor: 1
       allow_unknown: true
@@ -386,9 +336,9 @@ behavior_server:
     transform_tolerance: 0.3
     simulate_ahead_time: 2.0
 
-    max_rotational_vel: 1.2
+    max_rotational_vel: 2.5
     min_rotational_vel: 0.1
-    rotational_acc_lim: 1.5
+    rotational_acc_lim: 6.0
 
 
 waypoint_follower:
@@ -415,11 +365,11 @@ velocity_smoother:
     feedback: "OPEN_LOOP"
 
     # Differential/skid-steer Twist limits: [vx, vy, wz]
-    max_velocity: [2.0, 0.0, 1.2]
-    min_velocity: [-0.5, 0.0, -1.2]
+    max_velocity: [1.2, 0.0, 2.5]
+    min_velocity: [-0.2, 0.0, -2.5]
 
-    max_accel: [1.5, 0.0, 1.5]
-    max_decel: [-1.5, 0.0, -1.5]
+    max_accel: [1.5, 0.0, 6.0]
+    max_decel: [-1.5, 0.0, -6.0]
 
     odom_topic: /odometry/filtered
     odom_duration: 0.2

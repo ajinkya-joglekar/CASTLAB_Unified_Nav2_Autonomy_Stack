@@ -31,8 +31,10 @@
       <!-- Speed and acceleration limits -->
       <max_linear_velocity>2.0</max_linear_velocity>
       <min_linear_velocity>-1.0</min_linear_velocity>
-      <max_angular_velocity>1.0</max_angular_velocity>
-      <min_angular_velocity>-1.0</min_angular_velocity>
+      <!-- Match Nav2 MPPI wz_max / velocity_smoother cap (2.0 rad/s). Was 1.0,
+           which silently clipped commanded turns and made skid-steer pivoting sluggish. -->
+      <max_angular_velocity>2.0</max_angular_velocity>
+      <min_angular_velocity>-2.0</min_angular_velocity>
       <max_linear_acceleration>1.5</max_linear_acceleration>
       <min_linear_acceleration>-1.5</min_linear_acceleration>
       <max_angular_acceleration>1.5</max_angular_acceleration>
@@ -111,7 +113,7 @@
 
   <!-- Wheel friction -->
   <gazebo reference="wolf_left_front_wheel">
-    <mu1>1.0</mu1><mu2>1.0</mu2>
+    <mu1>0.25</mu1><mu2>0.25</mu2>
     <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
     <material>Gazebo/DarkGrey</material>
   </gazebo>
@@ -121,12 +123,12 @@
     <material>Gazebo/DarkGrey</material>
   </gazebo>
   <gazebo reference="wolf_left_rear_wheel">
-    <mu1>1.0</mu1><mu2>1.0</mu2>
+    <mu1>0.25</mu1><mu2>0.25</mu2>
     <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
     <material>Gazebo/DarkGrey</material>
   </gazebo>
   <gazebo reference="wolf_right_front_wheel">
-    <mu1>1.0</mu1><mu2>1.0</mu2>
+    <mu1>0.25</mu1><mu2>0.25</mu2>
     <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
     <material>Gazebo/DarkGrey</material>
   </gazebo>
@@ -136,7 +138,7 @@
     <material>Gazebo/DarkGrey</material>
   </gazebo>
   <gazebo reference="wolf_right_rear_wheel">
-    <mu1>1.0</mu1><mu2>1.0</mu2>
+    <mu1>0.25</mu1><mu2>0.25</mu2>
     <kp>1e6</kp><kd>100</kd><minDepth>0.001</minDepth>
     <material>Gazebo/DarkGrey</material>
   </gazebo>

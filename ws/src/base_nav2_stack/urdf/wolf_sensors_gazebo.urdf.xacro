@@ -31,8 +31,8 @@
       <!-- Speed and acceleration limits -->
       <max_linear_velocity>2.0</max_linear_velocity>
       <min_linear_velocity>-1.0</min_linear_velocity>
-      <max_angular_velocity>1.0</max_angular_velocity>
-      <min_angular_velocity>-1.0</min_angular_velocity>
+      <max_angular_velocity>2.0</max_angular_velocity>
+      <min_angular_velocity>-2.0</min_angular_velocity>
       <max_linear_acceleration>1.5</max_linear_acceleration>
       <min_linear_acceleration>-1.5</min_linear_acceleration>
       <max_angular_acceleration>1.5</max_angular_acceleration>
