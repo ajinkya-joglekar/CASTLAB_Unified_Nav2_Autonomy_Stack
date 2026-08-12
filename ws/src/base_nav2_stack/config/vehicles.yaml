@@ -45,7 +45,7 @@ vehicles:
     rviz_config: rviz/ranger_nav2_custom.rviz
     compatible_worlds: [CAST_new, baylands]
     topics:
-      cmd_vel: /cmd_vel_pathing
+      cmd_vel: /cmd_vel_nav2
       odom: /odom
       filtered_odom: /odometry/filtered
       imu: /vectornav/imu
