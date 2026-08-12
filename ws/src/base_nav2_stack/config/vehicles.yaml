@@ -38,7 +38,7 @@ vehicles:
       camera_depth_image: /jeep/camera/depth_image
       camera_points: /jeep/camera/points
   wolf:
-    description: Skid steer (IMU+GPS only, no lidar/camera)
+    description: Wolf baseline platform (DiffDrive)
     urdf: urdf/wolf_gazebo.urdf.xacro
     nav2_config: config/nav2/wolf.yaml
     ekf_config: config/ekf/wolf_dual_ekf.yaml
@@ -55,23 +55,4 @@ vehicles:
       camera_image: /wolf/camera/image
       camera_info: /wolf/camera/camera_info
       camera_depth_image: /wolf/camera/depth_image
-      camera_points: /wolf/camera/points
-  wolf_sensors:
-    description: Skid steer with LiDAR + RGB-D camera
-    urdf: urdf/wolf_sensors_gazebo.urdf.xacro
-    nav2_config: config/nav2/wolf_sensors.yaml
-    ekf_config: config/ekf/wolf_sensors_dual_ekf.yaml
-    rviz_config: rviz/ranger_nav2_custom.rviz
-    compatible_worlds: [CAST_new, baylands]
-    topics:
-      cmd_vel: /cmd_vel
-      odom: /odom
-      filtered_odom: /odometry/filtered
-      imu: /imu
-      gps: /gps/fix
-      scan: /lidar
-      points: /lidar/points
-      camera_image: /wolf/camera/image
-      camera_info: /wolf/camera/camera_info
-      camera_depth_image: /wolf/camera/depth_image
-      camera_points: /wolf/camera/points
+      camera_points: /wolf/camera/min_points
